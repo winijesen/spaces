@@ -118,14 +118,14 @@ rm -rf /home/coder/.config/code-server
 mkdir -p /home/coder/.config/code-server
 
 cat > /home/coder/.config/code-server/config.yaml <<EOF
-bind-addr: 0.0.0.0:7860
+bind-addr: 0.0.0.0:10000
 auth: none
 EOF
 
 nohup code-server --config /home/coder/.config/code-server/config.yaml &
 
-echo "启动青龙主程序..."
+echo "青龙主程序已由 reload_pm2 启动，无需重复启动"
 
-pm2 start /ql/dist/server.js --name qinglong --wait-ready
 pm2 logs
+
 
