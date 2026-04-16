@@ -53,7 +53,7 @@ ENV QL_HOME=/home/$QL_USER
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
 
-# ⭐ 把 builder 阶段的 node_modules 复制进来（关键）
+# ⭐ 复制 builder 阶段的 node_modules（解决 reflect-metadata）
 COPY --from=builder /tmp/build/node_modules /usr/local/lib/node_modules
 
 RUN set -x && \
@@ -88,7 +88,7 @@ RUN set -x && \
   rm -rf /etc/apt/apt.conf.d/docker-clean && \
   ulimit -c 0
 
-# Install code-server
+# 安装 code-server
 RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.96.4
 
 RUN mkdir -p ${QL_DIR} && \
@@ -102,7 +102,12 @@ RUN chmod -R 777 /ql && \
   chmod -R 777 /usr && \
   chmod -R 777 /root 
 
+# ⭐ 删除默认 nginx 配置（解决 conflicting server name）
+RUN rm -f /etc/nginx/conf.d/default.conf
+
+# ⭐ 复制你修复后的 front.conf
 COPY front.conf /etc/nginx/conf.d/front.conf
+
 COPY notify.py /notify.py
 
 USER coder
@@ -130,7 +135,7 @@ RUN pip3 install --prefix ${PYTHON_HOME} requests
 
 USER root
 
-# ❗ 不再删除青龙官方 entrypoint（关键）
+# ⭐ 不再删除青龙官方 entrypoint
 # RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -146,4 +151,4 @@ ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 VOLUME /ql/data
   
-EXPOSE 8080
+EXPOSE 80
