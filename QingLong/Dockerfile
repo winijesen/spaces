@@ -137,8 +137,9 @@ RUN rclone config -h
 HEALTHCHECK --interval=5s --timeout=2s --retries=20 \
   CMD curl -sf --noproxy '*' http://127.0.0.1:5700/api/health || exit 1
 
-ENTRYPOINT ["./docker/docker-entrypoint.sh"]
+ENTRYPOINT ["/ql/docker/docker-entrypoint.sh"]
 
 VOLUME /ql/data
   
 EXPOSE 8080
+
