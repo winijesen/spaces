@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# ⭐ 关闭原镜像自带的 code-server，避免端口冲突
+pkill -f "code-server" 2>/dev/null
+
 export PATH="$HOME/bin:$PATH"
 
 dir_shell=/ql/shell
