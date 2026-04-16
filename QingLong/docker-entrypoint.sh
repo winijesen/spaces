@@ -126,5 +126,6 @@ nohup code-server --config /home/coder/.config/code-server/config.yaml &
 
 echo "启动青龙主程序..."
 
-# ⭐ 最关键：执行青龙官方启动脚本（必须存在）
-exec /ql/docker/docker-entrypoint.sh
+pm2 start /ql/dist/server.js --name qinglong --wait-ready
+pm2 logs
+
