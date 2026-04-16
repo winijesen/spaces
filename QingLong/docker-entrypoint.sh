@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "🔥🔥🔥 ENTRYPOINT VERSION: 2026-04-17-TEST 🔥🔥🔥"
+
 export PATH="$HOME/bin:$PATH"
 
 dir_shell=/ql/shell
