@@ -139,12 +139,15 @@ fi
 
 echo "启动 code-server ..."
 
+# 删除默认配置，避免端口被覆盖
+rm -f /home/coder/.config/code-server/config.yaml
+
 nohup code-server \
   --bind-addr 0.0.0.0:7860 \
   --auth none \
-  --disable-telemetry \
   &
-
+  
 tail -f /dev/null
 
 exec "$@"
+
