@@ -139,12 +139,17 @@ fi
 
 echo "启动 code-server ..."
 
-# 删除默认配置，避免端口被覆盖
-rm -f /home/coder/.config/code-server/config.yaml
+# 强制覆盖 config.yaml，避免 code-server 自动生成错误端口
+rm -rf /home/coder/.config/code-server
+mkdir -p /home/coder/.config/code-server
+
+cat > /home/coder/.config/code-server/config.yaml <<EOF
+bind-addr: 0.0.0.0:7860
+auth: none
+EOF
 
 nohup code-server \
-  --bind-addr 0.0.0.0:7860 \
-  --auth none \
+  --config /home/coder/.config/code-server/config.yaml \
   &
   
 tail -f /dev/null
