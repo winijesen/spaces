@@ -121,26 +121,24 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PNPM_HOM
   PYTHONPATH=${PYTHON_HOME}:${PYTHON_HOME}/lib/python${PYTHON_SHORT_VERSION}:${PYTHON_HOME}/lib/python${PYTHON_SHORT_VERSION}/site-packages
 
 RUN pip3 install --prefix ${PYTHON_HOME} requests
+
+# 删除旧 entrypoint
 RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
 
-COPY --chown=coder:coder --from=builder /tmp/build/node_modules/. /ql/node_modules/
+# 复制新的 entrypoint 到 root 可执行路径
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-COPY --chown=coder:coder services.json /ql/node_modules/nodemailer/lib/well-known/
-
-RUN chmod a+x ${QL_DIR}/docker/docker-entrypoint.sh
 
 WORKDIR ${QL_DIR}
 
-# 创建rclone配置文件
+# 创建 rclone 配置文件
 RUN rclone config -h
 
 HEALTHCHECK --interval=5s --timeout=2s --retries=20 \
   CMD curl -sf --noproxy '*' http://127.0.0.1:5700/api/health || exit 1
 
-ENTRYPOINT ["/ql/docker/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 VOLUME /ql/data
   
 EXPOSE 8080
-
