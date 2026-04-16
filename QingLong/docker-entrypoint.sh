@@ -58,12 +58,21 @@ log_with_style "SUCCESS" "🎉  容器启动成功!"
 
 echo -e "======================3. 启动nginx========================\n"
 
-# ⭐ 在这里加入 envsubst 替换 PORT
+###############################################
+# ⭐⭐ 检查 envsubst 是否存在（完整上下文）⭐⭐
+###############################################
+echo "=== 检查 envsubst 是否存在 ==="        # ←⭐ 标记1
+which envsubst || echo "which 找不到 envsubst"   # ←⭐ 标记2
+envsubst --version || echo "envsubst 无法执行"    # ←⭐ 标记3
+echo "=== 检查结束 ==="                     # ←⭐ 标记4
+###############################################
+
+# ⭐ 替换 Render 的 PORT 环境变量
 echo "替换 Render 的 PORT 环境变量..."
 envsubst '$PORT' < /etc/nginx/conf.d/front.conf > /etc/nginx/conf.d/front_render.conf
 mv /etc/nginx/conf.d/front_render.conf /etc/nginx/conf.d/front.conf
 
-# ⭐ 然后再启动 nginx
+# ⭐ 启动 nginx
 nginx -s reload 2>/dev/null || nginx -c /etc/nginx/nginx.conf
 echo -e "nginx启动成功...\n"
 
