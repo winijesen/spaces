@@ -157,6 +157,9 @@ else
   echo "没有检测到通知配置信息，不进行通知"
 fi
 
+which code-server
+echo ">>> STARTING CODE-SERVER ON 10001 <<<"
+
 echo "启动 code-server ..."
 
 rm -rf /home/coder/.config/code-server
@@ -167,10 +170,16 @@ bind-addr: 0.0.0.0:10001
 auth: none
 EOF
 
-nohup code-server --config /home/coder/.config/code-server/config.yaml &
+# ⭐ 不要用 nohup，输出日志到文件
+code-server --config /home/coder/.config/code-server/config.yaml > /tmp/code-server.log 2>&1 &
 
 echo "青龙主程序已由 reload_pm2 启动，无需重复启动"
 
-pm2 logs
+# ⭐ 先打印 code-server 日志
+echo ">>> CODE-SERVER LOG <<<"
+cat /tmp/code-server.log || true
+
+# ⭐ 最后再启动 pm2 logs（后台执行）
+pm2 logs &
 
 
