@@ -155,7 +155,7 @@ rm -rf /home/coder/.config/code-server
 mkdir -p /home/coder/.config/code-server
 
 cat > /home/coder/.config/code-server/config.yaml <<EOF
-bind-addr: 0.0.0.0:10000
+bind-addr: 0.0.0.0:10001
 auth: none
 EOF
 
