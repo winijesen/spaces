@@ -114,6 +114,7 @@ RUN rm -f /etc/nginx/conf.d/default.conf && \
 
 # ⭐ 复制你修复后的 front.conf
 COPY front.conf /etc/nginx/conf.d/front.conf
+RUN echo "=== FRONT CONF ===" && cat /etc/nginx/conf.d/front.conf
 
 COPY notify.py /notify.py
 
