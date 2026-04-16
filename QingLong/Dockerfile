@@ -96,7 +96,7 @@ RUN chmod -R 777 /ql && \
   chmod -R 777 /usr && \
   chmod -R 777 /root 
 
-COPY front.conf /etc/nginx/conf.d
+COPY front.conf /etc/nginx/conf.d/front.conf
 COPY notify.py /notify.py
 
 USER coder
