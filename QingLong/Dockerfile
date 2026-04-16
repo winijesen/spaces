@@ -124,7 +124,8 @@ RUN pip3 install --prefix ${PYTHON_HOME} requests
 RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
 
 COPY --chown=coder:coder --from=builder /tmp/build/node_modules/. /ql/node_modules/
-COPY --chown=coder:coder docker-entrypoint.sh ${QL_DIR}/docker
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY --chown=coder:coder services.json /ql/node_modules/nodemailer/lib/well-known/
 
 RUN chmod a+x ${QL_DIR}/docker/docker-entrypoint.sh
