@@ -53,6 +53,9 @@ ENV QL_HOME=/home/$QL_USER
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
 
+# ⭐ 把 builder 阶段的 node_modules 复制进来（关键）
+COPY --from=builder /tmp/build/node_modules /usr/local/lib/node_modules
+
 RUN set -x && \
   ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
   ln -s /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx && \
@@ -126,7 +129,10 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PNPM_HOM
 RUN pip3 install --prefix ${PYTHON_HOME} requests
 
 USER root
-RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
+
+# ❗ 不再删除青龙官方 entrypoint（关键）
+# RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
+
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 USER coder
