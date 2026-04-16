@@ -36,6 +36,27 @@ export_ql_envs
 import_config "$@"
 fix_config
 
+###############################################
+# ⭐⭐ 让青龙监听 Render 注入的 PORT ⭐⭐
+###############################################
+echo "Render PORT = $PORT"
+
+# 如果 PORT 为空，给出提示（Render 必须注入）
+if [ -z "$PORT" ]; then
+  echo "❌ Render 没有注入 PORT，青龙无法监听正确端口"
+else
+  echo "✔ Render 注入的 PORT = $PORT"
+fi
+
+# 修改青龙 .env 的端口
+if [ -f "$QL_DIR/.env" ]; then
+  sed -i "s/^PORT=.*/PORT=$PORT/" "$QL_DIR/.env"
+  echo "✔ 已将青龙监听端口改为：$PORT"
+else
+  echo "⚠️ 找不到 $QL_DIR/.env，无法修改端口"
+fi
+###############################################
+
 # PM2 初始化
 pm2 l &>/dev/null || log_with_style "WARN" "PM2 初始化失败，将在启动时尝试备用方案"
 
