@@ -122,12 +122,12 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PNPM_HOM
 
 RUN pip3 install --prefix ${PYTHON_HOME} requests
 
-# 删除旧 entrypoint
+USER root
 RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
-
-# 复制新的 entrypoint 到 root 可执行路径
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+USER coder
+
 
 WORKDIR ${QL_DIR}
 
