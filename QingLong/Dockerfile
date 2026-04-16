@@ -6,8 +6,10 @@ LABEL maintainer="${QL_MAINTAINER}"
 ARG QL_URL=https://github.com/${QL_MAINTAINER}/qinglong.git
 ARG QL_BRANCH=debian
 ENV QL_DIR=/ql_tmp
+
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
+
 RUN set -x && \
   ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm && \
   apt-get update && \
@@ -18,6 +20,7 @@ RUN set -x && \
   npm i -g pnpm@8.3.1 && \
   cd /tmp/build && \
   pnpm install --prod && \
+  pnpm add reflect-metadata && \
   rm -rf ${QL_DIR}
 
 
@@ -128,11 +131,7 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 USER coder
 
-
 WORKDIR ${QL_DIR}
-
-# 创建 rclone 配置文件
-RUN rclone config -h
 
 HEALTHCHECK --interval=5s --timeout=2s --retries=20 \
   CMD curl -sf --noproxy '*' http://127.0.0.1:5700/api/health || exit 1
