@@ -6,7 +6,8 @@ dir_shell=/ql/shell
 . $dir_shell/share.sh
 
 echo -e "======================写入rclone配置========================\n"
-echo "$RCLONE_CONF" > ~/.config/rclone/rclone.conf
+mkdir -p /home/coder/.config/rclone
+echo "$RCLONE_CONF" > /home/coder/.config/rclone/rclone.conf
 
 export_ql_envs() {
   export BACK_PORT="${ql_port}"
@@ -124,4 +125,6 @@ EOF
 nohup code-server --config /home/coder/.config/code-server/config.yaml &
 
 echo "启动青龙主程序..."
+
+# ⭐ 最关键：执行青龙官方启动脚本（必须存在）
 exec /ql/docker/docker-entrypoint.sh
