@@ -108,7 +108,8 @@ RUN echo "=== CONF.D LIST ===" && ls -l /etc/nginx/conf.d && \
     echo "=== SITES-ENABLED LIST ===" && ls -l /etc/nginx/sites-enabled || true
 
 # ⭐ 删除默认 nginx 配置（避免 80 端口冲突）
-RUN rm -f /etc/nginx/conf.d/default.conf
+RUN rm -f /etc/nginx/conf.d/default.conf && \
+    rm -f /etc/nginx/sites-enabled/default
 
 
 # ⭐ 复制你修复后的 front.conf
