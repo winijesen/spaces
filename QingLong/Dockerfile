@@ -75,9 +75,11 @@ RUN set -x && \
   libatomic1 \
   nginx \
   rclone \
-  sshpass && \
+  sshpass \
+  gettext-base && \
   apt-get clean && \
   ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
+
   echo "Asia/Shanghai" >/etc/timezone && \
   git config --global user.email "qinglong@users.noreply.github.com" && \
   git config --global user.name "qinglong" && \
