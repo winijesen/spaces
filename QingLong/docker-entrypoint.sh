@@ -170,16 +170,20 @@ bind-addr: 0.0.0.0:10001
 auth: none
 EOF
 
-# ⭐ 不要用 nohup，输出日志到文件
+# ⭐ 启动 code-server 并记录日志
+echo ">>> RUNNING CODE-SERVER <<<"
 code-server --config /home/coder/.config/code-server/config.yaml > /tmp/code-server.log 2>&1 &
+sleep 2
+
+# ⭐ 打印退出码 + 日志（只打印一次）
+echo ">>> CODE-SERVER EXIT CODE: $? <<<"
+echo ">>> CODE-SERVER LOG CONTENT <<<"
+cat /tmp/code-server.log || true
 
 echo "青龙主程序已由 reload_pm2 启动，无需重复启动"
 
-# ⭐ 先打印 code-server 日志
-echo ">>> CODE-SERVER LOG <<<"
-cat /tmp/code-server.log || true
-
-# ⭐ 最后再启动 pm2 logs（后台执行）
+# ⭐ pm2 logs 放最后，后台执行，避免阻塞
 pm2 logs &
+
 
 
