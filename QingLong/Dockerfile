@@ -24,6 +24,9 @@ RUN set -x && \
   rm -rf ${QL_DIR}
 
 
+# -------------------------------
+#   Final Stage
+# -------------------------------
 FROM python:3.11-slim-bookworm
 
 ARG QL_MAINTAINER="whyour"
@@ -52,8 +55,6 @@ ENV QL_HOME=/home/$QL_USER
 
 COPY --from=nodebuilder /usr/local/bin/node /usr/local/bin/
 COPY --from=nodebuilder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
-
-# ⭐ 复制 builder 阶段的 node_modules（解决 reflect-metadata）
 COPY --from=builder /tmp/build/node_modules /usr/local/lib/node_modules
 
 RUN set -x && \
@@ -62,20 +63,8 @@ RUN set -x && \
   apt-get update && \
   apt-get upgrade -y && \
   apt-get install --no-install-recommends -y git \
-  curl \
-  wget \
-  tzdata \
-  perl \
-  openssl \
-  openssh-client \
-  jq \
-  procps \
-  netcat-openbsd \
-  unzip \
-  libatomic1 \
-  nginx \
-  rclone \
-  sshpass && \
+  curl wget tzdata perl openssl openssh-client jq procps \
+  netcat-openbsd unzip libatomic1 nginx rclone sshpass && \
   apt-get clean && \
   ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
   echo "Asia/Shanghai" >/etc/timezone && \
@@ -83,41 +72,34 @@ RUN set -x && \
   git config --global user.name "qinglong" && \
   git config --global http.postBuffer 524288000 && \
   npm install -g pnpm@8.3.1 pm2 ts-node && \
-  rm -rf /root/.cache && \
-  rm -rf /root/.npm && \
-  rm -rf /etc/apt/apt.conf.d/docker-clean && \
+  rm -rf /root/.cache /root/.npm /etc/apt/apt.conf.d/docker-clean && \
   ulimit -c 0
 
-# 安装 code-server
+# -------------------------------
+# 安装 code-server（只保留一次）
+# -------------------------------
 RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --version=4.96.4
 
-RUN mkdir -p ${QL_DIR} && \
-  chown -R ${QL_UID}:${QL_GID} ${QL_DIR}
-
-RUN chmod -R 777 /ql && \
-  chmod -R 777 /var && \
-  chmod -R 777 /usr/local && \
-  chmod -R 777 /etc/nginx && \
-  chmod -R 777 /run && \
-  chmod -R 777 /usr && \
-  chmod -R 777 /root 
-
-
-# ⭐ 调试：列出所有 nginx 配置文件
-RUN echo "=== CONF.D LIST ===" && ls -l /etc/nginx/conf.d && \
-    echo "=== SITES-ENABLED LIST ===" && ls -l /etc/nginx/sites-enabled || true
-
-# ⭐ 删除默认 nginx 配置（避免 80 端口冲突）
+# -------------------------------
+# 删除默认 nginx 配置
+# -------------------------------
 RUN rm -f /etc/nginx/conf.d/default.conf && \
     rm -f /etc/nginx/sites-enabled/default
 
-
-# ⭐ 复制你修复后的 front.conf
+# -------------------------------
+# 复制 front.conf 并打印确认
+# -------------------------------
 COPY front.conf /etc/nginx/conf.d/front.conf
 RUN echo "=== FRONT CONF ===" && cat /etc/nginx/conf.d/front.conf
 
+# -------------------------------
+# 复制 notify.py
+# -------------------------------
 COPY notify.py /notify.py
 
+# -------------------------------
+# 切换 coder 用户并安装青龙
+# -------------------------------
 USER coder
 ARG SOURCE_COMMIT
 RUN git clone --depth=1 -b ${QL_BRANCH} ${QL_URL} ${QL_DIR} && \
@@ -142,10 +124,6 @@ ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:${PNPM_HOM
 RUN pip3 install --prefix ${PYTHON_HOME} requests
 
 USER root
-
-# ⭐ 不再删除青龙官方 entrypoint
-# RUN rm -f ${QL_DIR}/docker/docker-entrypoint.sh
-
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 USER coder
@@ -158,5 +136,4 @@ HEALTHCHECK --interval=5s --timeout=2s --retries=20 \
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 
 VOLUME /ql/data
-  
 EXPOSE 80
